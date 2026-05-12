@@ -1607,26 +1607,51 @@
       overflow: hidden;
       display: none;
       flex-direction: column;
-      max-height: 0;
-      transition: max-height 0.3s ease, opacity 0.2s ease;
-      opacity: 0;
+      transition: all 0.25s ease;
     }
     .conv-panel.show {
       display: flex;
-      max-height: 400px;
-      opacity: 1;
+    }
+    .conv-panel.collapsed .conv-list {
+      max-height: 0;
+      padding-top: 0;
+      padding-bottom: 0;
+      opacity: 0;
     }
     .conv-panel-header {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 10px 12px 6px;
+      padding: 8px 12px;
+      cursor: pointer;
+      user-select: none;
       flex-shrink: 0;
+      transition: background var(--transition-fast);
+      border-radius: var(--radius-md);
+    }
+    .conv-panel-header:hover {
+      background: var(--bg-secondary);
     }
     .conv-panel-title {
       font-size: 12px;
       font-weight: 600;
       color: var(--text-tertiary);
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      flex: 1;
+    }
+    .conv-panel-chevron {
+      width: 14px;
+      height: 14px;
+      flex-shrink: 0;
+      color: var(--text-tertiary);
+      transition: transform 0.25s ease;
+    }
+    .conv-panel.collapsed .conv-panel-chevron {
+      transform: rotate(-90deg);
+    }
+    .conv-panel-actions {
       display: flex;
       align-items: center;
       gap: 4px;
@@ -1655,6 +1680,9 @@
       flex-direction: column;
       gap: 2px;
       scrollbar-width: thin;
+      max-height: 340px;
+      transition: max-height 0.25s ease, opacity 0.2s ease, padding 0.25s ease;
+      opacity: 1;
     }
     .conv-list::-webkit-scrollbar { width: 4px; }
     .conv-list::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 2px; }
@@ -3115,15 +3143,17 @@ Authorization: Bearer {token}</div>
         </div>
         <!-- 对话历史面板 -->
         <div class="conv-panel" id="convPanel">
-          <div class="conv-panel-header">
+          <div class="conv-panel-header" onclick="toggleConvPanel()">
             <span class="conv-panel-title">
-              <svg viewBox="0 0 24 24" style="width:12px;height:12px;stroke:currentColor;stroke-width:2;fill:none;"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+              <svg class="conv-panel-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
               对话列表
             </span>
-            <button class="conv-new-btn" onclick="createNewConversation()">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-              新建对话
-            </button>
+            <div class="conv-panel-actions" onclick="event.stopPropagation()">
+              <button class="conv-new-btn" onclick="createNewConversation()">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                新建对话
+              </button>
+            </div>
           </div>
           <div class="conv-list" id="convList"></div>
         </div>
@@ -3649,6 +3679,12 @@ Authorization: Bearer {token}</div>
           </div>
         </div>
       `;
+    }
+
+    // 收起/展开对话面板
+    function toggleConvPanel() {
+      const panel = document.getElementById('convPanel');
+      panel.classList.toggle('collapsed');
     }
 
     // 渲染对话列表
